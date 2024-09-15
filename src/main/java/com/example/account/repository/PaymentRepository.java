@@ -1,15 +1,16 @@
 package com.example.account.repository;
 
-import com.example.account.domain.PaymentEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.example.account.domain.PaymentEntity;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
 
-    Optional<PaymentEntity> findByOrderId(String orderId);
+	Optional<PaymentEntity> findByOrderId(String orderId);
 
-    Optional<PaymentEntity> findByPaymentKey(String paymentKey);
+	Optional<PaymentEntity> findByPaymentKey(String paymentKey);
 }

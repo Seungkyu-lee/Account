@@ -1,15 +1,27 @@
 package com.example.account.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Builder
 @Entity
@@ -18,53 +30,53 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String username;
+	private String username;
 
-    @JsonIgnore
-    private String password;
+	@JsonIgnore
+	private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles;
+	@ElementCollection(fetch = FetchType.EAGER)
+	private List<String> roles;
 
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
+	@Override
+	@JsonIgnore
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return this.roles.stream()
+			.map(SimpleGrantedAuthority::new)
+			.collect(Collectors.toList());
+	}
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
 
-    @Override
-    public String getUsername() {
-        return this.username;
-    }
+	@Override
+	public String getUsername() {
+		return this.username;
+	}
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
 
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
 }
