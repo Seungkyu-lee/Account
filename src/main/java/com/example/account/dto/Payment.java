@@ -3,12 +3,11 @@ package com.example.account.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import com.example.account.type.TransactionResultType;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

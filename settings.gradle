@@ -1,1 +1,3 @@
 rootProject.name = 'Account'
+include ':module-common'
+include ':module-pay'
