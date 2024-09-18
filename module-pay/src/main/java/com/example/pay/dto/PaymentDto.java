@@ -1,34 +1,50 @@
 package com.example.pay.dto;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.pay.domain.PaymentEntity;
-import com.example.pay.type.TransactionResultType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PaymentDto {
-	private String paymentKey;
-	private String orderId;
-	private BigDecimal totalAmount;
-	private LocalDateTime requestedAt;
-	private TransactionResultType transactionResultType;
 
+	private Long id;
+	private String orderId;
+	private String paymentKey;
+	private Long totalAmount;
+	private String status;
+	private String paymentType;
+	private LocalDateTime approvedAt;
+
+	// Entity를 DTO로 변환하는 정적 메서드
 	public static PaymentDto fromEntity(PaymentEntity entity) {
 		return PaymentDto.builder()
-			.paymentKey(entity.getPaymentKey())
+			.id(entity.getId())
 			.orderId(entity.getOrderId())
-			.totalAmount(BigDecimal.valueOf(entity.getTotalAmount()))
-			.requestedAt(entity.getRequestedAt())
-			.transactionResultType(entity.getTransactionResultType())
+			.paymentKey(entity.getPaymentKey())
+			.totalAmount(entity.getTotalAmount())
+			.status(entity.getStatus())
+			.paymentType(entity.getPaymentType())
+			.approvedAt(entity.getApprovedAt())
+			.build();
+	}
+
+	// DTO를 Entity로 변환하는 메서드
+	public PaymentEntity toEntity() {
+		return PaymentEntity.builder()
+			.orderId(this.orderId)
+			.paymentKey(this.paymentKey)
+			.totalAmount(this.totalAmount)
+			.status(this.status)
+			.paymentType(this.paymentType)
+			.approvedAt(this.approvedAt)
 			.build();
 	}
 }
