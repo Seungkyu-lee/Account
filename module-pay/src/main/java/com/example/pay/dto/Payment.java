@@ -2,15 +2,20 @@ package com.example.pay.dto;
 
 import java.time.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Payment {
 
 	@Data
@@ -18,8 +23,14 @@ public class Payment {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Request {
+		@NotBlank(message = "Payment key is required")
 		private String paymentKey;
+
+		@NotBlank(message = "Order ID is required")
 		private String orderId;
+
+		@NotNull(message = "Amount is required")
+		@Positive(message = "Amount must be positive")
 		private Integer amount;
 	}
 
@@ -27,7 +38,6 @@ public class Payment {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Response {
 		@JsonProperty("mId")
 		private String mId;
@@ -40,11 +50,7 @@ public class Payment {
 		private Integer totalAmount;
 		private Integer balanceAmount;
 		private String status;
-
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
 		private OffsetDateTime requestedAt;
-
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
 		private OffsetDateTime approvedAt;
 
 		private Boolean useEscrow;
@@ -66,19 +72,23 @@ public class Payment {
 		private Checkout checkout;
 		private CashReceipt cashReceipt;
 		private Discount discount;
+
 	}
 
 	@Data
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
+
 	public static class StatusResponse {
 		private String mId;
 		private String version;
 		private String paymentKey;
 		private String orderId;
 		private String status;
+
 		private OffsetDateTime requestedAt;
+
 		private OffsetDateTime approvedAt;
 	}
 
@@ -108,8 +118,7 @@ public class Payment {
 		private String accountNumber;
 		private String bankCode;
 		private String customerName;
-
-		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    
 		private OffsetDateTime dueDate;
 
 		private String refundStatus;

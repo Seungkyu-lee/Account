@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class TestBean {
 
 	public void dependencyTest() {
-		System.out.println("성공적으로 로딩됐습니다.");
+		//System.out.println("성공적으로 로딩됐습니다.");
 	}
 
 }
