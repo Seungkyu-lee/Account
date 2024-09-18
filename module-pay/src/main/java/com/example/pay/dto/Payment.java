@@ -1,73 +1,188 @@
 package com.example.pay.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
-import com.example.pay.type.TransactionResultType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class Payment {
-	@Getter
-	@NoArgsConstructor(force = true)
-	@AllArgsConstructor
+
+	@Data
 	@Builder
-	@Valid
+	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class Request {
-		@NotNull(message = "결제 금액은 필수입니다.")
-		private final BigDecimal amount;
-
-		@NotNull(message = "주문번호는 필수입니다.")
-		@Size(min = 6, max = 64, message = "주문번호는 6자에서 64자 사이여야 합니다.")
-		private final String orderId;
-
-		@Size(max = 200, message = "paymentKey는 200자를 초과할 수 없습니다.")
-		private final String paymentKey;
+		private String paymentKey;
+		private String orderId;
+		private Integer amount;
 	}
 
-	@Getter
+	@Data
+	@Builder
+	@NoArgsConstructor
 	@AllArgsConstructor
-	@Builder
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Response {
-		private final String paymentKey;
-		private final String orderId;
-		private final BigDecimal totalAmount;
-		private final LocalDateTime requestedAt;
+		@JsonProperty("mId")
+		private String mId;
+		private String version;
+		private String paymentKey;
+		private String orderId;
+		private String orderName;
+		private String currency;
+		private String method;
+		private Integer totalAmount;
+		private Integer balanceAmount;
+		private String status;
 
-		public static Response from(PaymentDto dto) {
-			return Response.builder()
-				.paymentKey(dto.getPaymentKey())
-				.orderId(dto.getOrderId())
-				.totalAmount(dto.getTotalAmount())
-				.requestedAt(dto.getRequestedAt())
-				.build();
-		}
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+		private OffsetDateTime requestedAt;
+
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+		private OffsetDateTime approvedAt;
+
+		private Boolean useEscrow;
+		private String lastTransactionKey;
+		private Integer suppliedAmount;
+		private Integer vat;
+		private Boolean cultureExpense;
+		private Integer taxFreeAmount;
+		private Integer taxExemptionAmount;
+		private Card card;
+		private VirtualAccount virtualAccount;
+		private String secret;
+		private String type;
+		private EasyPay easyPay;
+		private String country;
+		private Failure failure;
+		private Boolean isPartialCancelable;
+		private Receipt receipt;
+		private Checkout checkout;
+		private CashReceipt cashReceipt;
+		private Discount discount;
 	}
 
-	@Getter
+	@Data
 	@Builder
+	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class StatusResponse {
-		private final String paymentKey;
-		private final String orderId;
-		private final BigDecimal totalAmount;
-		private final LocalDateTime requestedAt;
-		private final TransactionResultType transactionResultType;
+		private String mId;
+		private String version;
+		private String paymentKey;
+		private String orderId;
+		private String status;
+		private OffsetDateTime requestedAt;
+		private OffsetDateTime approvedAt;
+	}
 
-		public static StatusResponse from(PaymentDto dto) {
-			return StatusResponse.builder()
-				.orderId(dto.getOrderId())
-				.totalAmount(dto.getTotalAmount())
-				.transactionResultType(dto.getTransactionResultType())
-				.requestedAt(dto.getRequestedAt())
-				.paymentKey(dto.getPaymentKey())
-				.build();
-		}
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Card {
+		private String company;
+		private String number;
+		private String installmentPlanMonths;
+		private String isInterestFree;
+		private String approveNo;
+		private String useCardPoint;
+		private String cardType;
+		private String ownerType;
+		private String acquireStatus;
+		private String receiptUrl;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class VirtualAccount {
+		private String accountType;
+		private String accountNumber;
+		private String bankCode;
+		private String customerName;
+
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+		private OffsetDateTime dueDate;
+
+		private String refundStatus;
+		private Boolean expired;
+		private String settlementStatus;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class EasyPay {
+		private String provider;
+		private Integer amount;
+		private Integer discountAmount;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Failure {
+		private String code;
+		private String message;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class CanceledAmount {
+		private Integer total;
+		private Integer taxFree;
+		private Integer vat;
+		private Integer point;
+		private Integer discount;
+		private Integer greenDeposit;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Receipt {
+		private String url;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Checkout {
+		private String url;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class CashReceipt {
+		private String type;
+		private String receiptKey;
+		private String issueNumber;
+		private String receiptUrl;
+		private Integer amount;
+		private Integer taxFreeAmount;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class Discount {
+		private Integer amount;
 	}
 }

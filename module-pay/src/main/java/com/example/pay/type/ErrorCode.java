@@ -21,6 +21,9 @@ public enum ErrorCode {
 	// 외부 결제 시스템 관련 에러
 	EXTERNAL_PAYMENT_SYSTEM_ERROR("외부 결제 시스템 오류"),
 	PAYMENT_DECLINED("결제가 거절되었습니다"),
+	DUPLICATE_PAYMENT("이미 처리된 주문입니다"),
+	INVALID_PAYMENT_TYPE("지원하지 않는 결제 유형입니다"),
+	TOSS_PAYMENT_FAILED("토스 결제 승인 실패"),
 
 	// 계정 관련 에러
 	INSUFFICIENT_BALANCE("잔액이 부족합니다"),

@@ -34,6 +34,7 @@ public class SecurityConfiguration {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(AntPathRequestMatcher.antMatcher("/**/signup")).permitAll()
 				.requestMatchers(AntPathRequestMatcher.antMatcher("/**/signin")).permitAll()
+				.requestMatchers(AntPathRequestMatcher.antMatcher("/api/payments/**")).permitAll()
 				.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
 				.anyRequest().authenticated()
 			)
