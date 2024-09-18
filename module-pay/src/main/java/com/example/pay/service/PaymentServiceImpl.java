@@ -1,12 +1,14 @@
 package com.example.pay.service;
 
 import java.time.Duration;
+
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
 
 import com.example.pay.config.TossPaymentConfig;
 import com.example.pay.domain.PaymentEntity;
@@ -59,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 			ResponseEntity<Payment.Response> response = restTemplate.postForEntity(
 				TossPaymentConfig.URL + request.getPaymentKey(),
+
 				entity,
 				Payment.Response.class
 			);
@@ -67,7 +71,6 @@ public class PaymentServiceImpl implements PaymentService {
 				log.info("결제 확인 성공: {}", response.getBody());
 
 				savePaymentInfo(Objects.requireNonNull(response.getBody()));
-
 				// 결제 확인 후 캐시 무효화
 				invalidateCache(request.getOrderId(), request.getPaymentKey());
 
@@ -85,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	public Payment.Response getPaymentStatus(String orderId, String paymentKey) {
 		log.info("결제 상태 조회 요청: orderId={}, paymentKey={}", orderId, paymentKey);
-
+    
 		// 캐시 키 생성
 		String cacheKey = generateCacheKey(orderId, paymentKey);
 
@@ -109,6 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
 			log.info("결제 정보 Redis 캐시에 저장 완료: {}", paymentResponse);
 
 			return paymentResponse;
+
 
 		} catch (Exception e) {
 			log.error("결제 상태 조회 중 오류 발생: {}", e.getMessage());
@@ -142,6 +146,7 @@ public class PaymentServiceImpl implements PaymentService {
 		if (existingPayment.isPresent()) {
 			log.error("중복된 결제 발견. 주문 ID: {}", orderId);
 			throw new PaymentException(ErrorCode.DUPLICATE_PAYMENT, "이 주문에 대한 결제가 이미 존재합니다");
+
 		}
 
 		log.info("기존 결제 확인 완료. 중복 결제 없음");
@@ -210,5 +215,20 @@ public class PaymentServiceImpl implements PaymentService {
 			log.error("Redis 연결 실패 중 캐시 무효화 시도: {}", e.getMessage(), e);
 			// 필요에 따라 계속 진행하거나 커스텀 예외를 던질지 결정
 		}
+
+		log.info("기존 결제 확인 완료. 중복 결제 없음");
+	}
+
+	private void savePaymentInfo(Payment.Response response) {
+		PaymentEntity payment = PaymentEntity.builder()
+			.orderId(response.getOrderId())
+			.paymentKey(response.getPaymentKey())
+			.totalAmount(Long.valueOf(response.getTotalAmount()))
+			.status(response.getStatus())
+			.paymentType("TOSS")
+			.approvedAt(response.getApprovedAt().toLocalDateTime())
+			.build();
+
+		paymentRepository.save(payment);
 	}
 }

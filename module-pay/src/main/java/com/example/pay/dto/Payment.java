@@ -2,12 +2,14 @@ package com.example.pay.dto;
 
 import java.time.OffsetDateTime;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -70,12 +72,14 @@ public class Payment {
 		private Checkout checkout;
 		private CashReceipt cashReceipt;
 		private Discount discount;
+
 	}
 
 	@Data
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
+
 	public static class StatusResponse {
 		private String mId;
 		private String version;
@@ -114,7 +118,7 @@ public class Payment {
 		private String accountNumber;
 		private String bankCode;
 		private String customerName;
-
+    
 		private OffsetDateTime dueDate;
 
 		private String refundStatus;
