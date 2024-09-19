@@ -3,7 +3,7 @@ package com.example.pay;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = PayApplication.class)
 class PayApplicationTests {
 
 	@Test

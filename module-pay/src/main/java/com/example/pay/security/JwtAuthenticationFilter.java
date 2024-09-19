@@ -6,7 +6,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
@@ -31,11 +30,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		FilterChain filterChain) throws ServletException, IOException {
 		String token = this.resolveTokenFromRequest(request);
 
-		if (StringUtils.hasText(token) && this.tokenProvider.validateToken(token)) {
-			Authentication auth = this.tokenProvider.getAuthentication(token);
+		if (token != null && tokenProvider.validateToken(token)) {
+			Authentication auth = tokenProvider.getAuthentication(token);
 			SecurityContextHolder.getContext().setAuthentication(auth);
 
-			log.info(String.format("[%s] -> %s", this.tokenProvider.getUsername(token), request.getRequestURI()));
+			log.info(String.format("[%s] -> %s", tokenProvider.getUsername(token), request.getRequestURI()));
 		}
 
 		filterChain.doFilter(request, response);
