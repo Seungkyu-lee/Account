@@ -15,16 +15,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-	private final JwtAuthenticationFilter authenticationFilter;
+	private final TokenProvider tokenProvider;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,16 +31,14 @@ public class SecurityConfiguration {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(AntPathRequestMatcher.antMatcher("/**/signup")).permitAll()
-				.requestMatchers(AntPathRequestMatcher.antMatcher("/**/signin")).permitAll()
-				.requestMatchers(AntPathRequestMatcher.antMatcher("/api/payments/**")).permitAll()
+				.requestMatchers(AntPathRequestMatcher.antMatcher("/api/**")).permitAll()
 				.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
 				.anyRequest().authenticated()
 			)
-			.addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-			.headers(headers -> headers
-				.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
-			);
+			.formLogin(AbstractHttpConfigurer::disable)
+			.httpBasic(AbstractHttpConfigurer::disable)
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+			.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
 		return http.build();
 	}

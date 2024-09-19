@@ -1,4 +1,3 @@
 dependencies {
     implementation project(':module-common')
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0'
 }

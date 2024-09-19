@@ -6,14 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
-import com.example.pay.service.MemberService;
+import com.example.pay.domain.MemberEntity;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -21,58 +19,58 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
-	private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1 hour
+	private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1시간
 	private static final String KEY_ROLES = "roles";
 
-	private final MemberService memberService;
+	private final UserDetailsService userDetailsService;
 
-	@Value("{spring.jwt.secret}")
+	@Value("${spring.jwt.secret}")
 	private String secretKey;
 
-	/**
-	 * 토큰 생성(발급)
-	 * @param username
-	 * @param roles
-	 * @return
-	 */
+	// JWT 토큰 생성
 	public String generateToken(String username, List<String> roles) {
 		Claims claims = Jwts.claims().setSubject(username);
 		claims.put(KEY_ROLES, roles);
-
-		var now = new Date();
-		var expiredDate = new Date(now.getTime() + TOKEN_EXPIRE_TIME);
+		Date now = new Date();
 
 		return Jwts.builder()
 			.setClaims(claims)
-			.setIssuedAt(now)   // 토큰 생성 시간
-			.setExpiration(expiredDate) // 토큰 만료 시간
-			.signWith(SignatureAlgorithm.HS512, this.secretKey) // 사용할 암호화 알고리즘, 비밀키
+			.setIssuedAt(now)
+			.setExpiration(new Date(now.getTime() + TOKEN_EXPIRE_TIME))
+			.signWith(SignatureAlgorithm.HS256, secretKey)
 			.compact();
 	}
 
-	public Authentication getAuthentication(String jwt) {
-		UserDetails userDetails = this.memberService.loadUserByUsername(this.getUsername(jwt));
+	// JWT 토큰에서 인증 정보 조회
+	public Authentication getAuthentication(String token) {
+		MemberEntity userDetails = (MemberEntity)userDetailsService.loadUserByUsername(this.getUsername(token));
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 
+	// JWT 토큰에서 사용자 이름 조회
 	public String getUsername(String token) {
 		return this.parseClaims(token).getSubject();
 	}
 
+	// JWT 토큰 유효성 검증
 	public boolean validateToken(String token) {
-		if (!StringUtils.hasText(token)) {
+		if (token == null) {
 			return false;
 		}
 
-		var claims = this.parseClaims(token);
-		return !claims.getExpiration().before(new Date());
+		try {
+			Claims claims = this.parseClaims(token);
+			return !claims.getExpiration().before(new Date());
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
+	// Claims 파싱
 	private Claims parseClaims(String token) {
-		try {
-			return Jwts.parser().setSigningKey(this.secretKey).parseClaimsJws(token).getBody();
-		} catch (ExpiredJwtException e) {
-			return e.getClaims();
-		}
+		return Jwts.parser()
+			.setSigningKey(secretKey)
+			.parseClaimsJws(token)
+			.getBody();
 	}
 }
