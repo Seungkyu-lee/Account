@@ -2,7 +2,6 @@ package com.example.pay.domain;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -46,7 +45,7 @@ public class MemberEntity implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.roles.stream()
 			.map(SimpleGrantedAuthority::new)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	@Override

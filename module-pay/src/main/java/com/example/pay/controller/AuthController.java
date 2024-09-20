@@ -26,7 +26,7 @@ public class AuthController {
 	private final TokenProvider tokenProvider;
 
 	@PostMapping("/signup")
-	public CommonResponse<?> signup(@RequestBody Auth.SignUp request) {
+	public CommonResponse<MemberEntity> signup(@RequestBody Auth.SignUp request) {
 		var result = this.memberService.register(request);
 		return CommonResponse.success(result);
 	}
