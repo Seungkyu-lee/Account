@@ -1,7 +1,5 @@
 package com.example.pay.config;
 
-import java.io.IOException;
-
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
@@ -14,7 +12,7 @@ public class EmbeddedRedisConfig {
 	private RedisServer redisServer;
 
 	@PostConstruct
-	public void startRedis() throws IOException {
+	public void startRedis() {
 		redisServer = new RedisServer(6379); // 사용할 포트 번호 설정
 		redisServer.start();
 	}

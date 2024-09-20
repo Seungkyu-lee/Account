@@ -7,6 +7,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class AppRunner implements ApplicationRunner {
 	private final Environment environment;
@@ -17,15 +20,15 @@ public class AppRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		System.out.println("===================다중 프로파일 테스트===================");
-		System.out.println("Active profiles : " + Arrays.toString(environment.getActiveProfiles()));
-		System.out.println("Datasource driver : " + environment.getProperty("spring.datasource.driver-class-name"));
-		System.out.println("Datasource url : " + environment.getProperty("spring.datasource.url"));
-		System.out.println("Datasource username : " + environment.getProperty("spring.datasource.username"));
-		System.out.println("Datasource password : " + environment.getProperty("spring.datasource.password"));
-		System.out.println("Server Port : " + environment.getProperty("server.port"));
-		System.out.println("Default Property : " + environment.getProperty("default.string"));
-		System.out.println("Common Property : " + environment.getProperty("common.string"));
-		System.out.println("====================================================");
+		log.debug("===================다중 프로파일 테스트===================");
+		log.debug("Active profiles : {}", Arrays.toString(environment.getActiveProfiles()));
+		log.debug("Datasource driver : {}", environment.getProperty("spring.datasource.driver-class-name"));
+		log.debug("Datasource url : {}", environment.getProperty("spring.datasource.url"));
+		log.debug("Datasource username : {}", environment.getProperty("spring.datasource.username"));
+		log.debug("Datasource password : {}", environment.getProperty("spring.datasource.password"));
+		log.debug("Server Port : {}", environment.getProperty("server.port"));
+		log.debug("Default Property : {}", environment.getProperty("default.string"));
+		log.debug("Common Property : {}", environment.getProperty("common.string"));
+		log.debug("====================================================");
 	}
 }

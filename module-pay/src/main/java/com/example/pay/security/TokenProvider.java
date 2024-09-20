@@ -1,7 +1,10 @@
 package com.example.pay.security;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,18 +17,24 @@ import com.example.pay.domain.MemberEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class TokenProvider {
-	private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1시간
+	private static final long TOKEN_EXPIRE_TIME = 1000L * 60L * 60; // 1시간
 	private static final String KEY_ROLES = "roles";
 
 	private final UserDetailsService userDetailsService;
 
 	@Value("${spring.jwt.secret}")
 	private String secretKey;
+
+	private SecretKey getSigningKey() {
+		byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+		return Keys.hmacShaKeyFor(keyBytes);
+	}
 
 	// JWT 토큰 생성
 	public String generateToken(String username, List<String> roles) {
@@ -37,7 +46,7 @@ public class TokenProvider {
 			.setClaims(claims)
 			.setIssuedAt(now)
 			.setExpiration(new Date(now.getTime() + TOKEN_EXPIRE_TIME))
-			.signWith(SignatureAlgorithm.HS256, secretKey)
+			.signWith(getSigningKey(), SignatureAlgorithm.HS256)
 			.compact();
 	}
 
@@ -68,8 +77,9 @@ public class TokenProvider {
 
 	// Claims 파싱
 	private Claims parseClaims(String token) {
-		return Jwts.parser()
-			.setSigningKey(secretKey)
+		return Jwts.parserBuilder()
+			.setSigningKey(getSigningKey())
+			.build()
 			.parseClaimsJws(token)
 			.getBody();
 	}
