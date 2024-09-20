@@ -4,6 +4,8 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 public class InfrastructureConfig {
 
@@ -11,8 +13,9 @@ public class InfrastructureConfig {
 	@Bean(name = "dataSource")
 	@Profile("dev")
 	DataSource dataSourceForDevelopment() {
-		// 생략
-		return null;
+		return new EmbeddedDatabaseBuilder()
+			.setType(EmbeddedDatabaseType.H2)
+			.build();
 	}
 
 	@Bean(name = "dataSource")

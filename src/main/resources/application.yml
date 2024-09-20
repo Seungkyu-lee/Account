@@ -12,3 +12,46 @@ spring:
 
 jwt:
   secret: ZGF5b25lLXNwcmluZy1ib290LWRpdmlkZW5kLXByb2plY3QtdHV0b3JpYWwtand0LXNlY3JldC1rZXkK
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: H2
+    hibernate:
+      ddl-auto: create-drop
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    org.hibernate.SQL: DEBUG
+  file:
+    name: ./logs/application-dev.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  # 테스트 환경 특정 설정
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  # 운영 환경 특정 설정
