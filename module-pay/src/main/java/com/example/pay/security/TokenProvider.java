@@ -9,15 +9,15 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-
-import com.example.pay.domain.MemberEntity;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -36,6 +36,14 @@ public class TokenProvider {
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
+	public String resolveToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+			return bearerToken.substring(7);
+		}
+		return null;
+	}
+
 	// JWT 토큰 생성
 	public String generateToken(String username, List<String> roles) {
 		Claims claims = Jwts.claims().setSubject(username);
@@ -52,7 +60,7 @@ public class TokenProvider {
 
 	// JWT 토큰에서 인증 정보 조회
 	public Authentication getAuthentication(String token) {
-		MemberEntity userDetails = (MemberEntity)userDetailsService.loadUserByUsername(this.getUsername(token));
+		UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUsername(token));
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 
