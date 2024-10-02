@@ -31,6 +31,12 @@ payment:
     success_url: http://localhost:8080/api/v1/payments/toss/success
     fail_url: http://localhost:8080/api/v1/payments/toss/fail
 
+restricted:
+  urls:
+    - /restricted
+    - /secret
+    - /admin
+
 logging:
   level:
     root: INFO
