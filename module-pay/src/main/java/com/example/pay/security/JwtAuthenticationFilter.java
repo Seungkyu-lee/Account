@@ -1,6 +1,7 @@
 package com.example.pay.security;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.MDC;
@@ -26,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	public static final String TOKEN_PREFIX = "Bearer ";
 
 	private final TokenProvider tokenProvider;
+	private final List<String> restrictedUrls;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -35,6 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		MDC.put("requestId", requestId);
 
 		try {
+			String requestUri = request.getRequestURI();
+
+			// URL 제한 검사
+			if (isRestrictedUrl(requestUri)) {
+				log.warn("접근이 제한된 URL입니다: {}", requestUri);
+				response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access to this URL is restricted");
+				return;
+			}
+
 			String token = this.resolveTokenFromRequest(request);
 
 			if (token != null && tokenProvider.validateToken(token)) {
@@ -44,15 +55,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				String username = tokenProvider.getUsername(token);
 				MDC.put("username", username);
 
-				log.info("인증된 사용자 {}가 {}에 접근합니다", username, request.getRequestURI());
+				log.info("인증된 사용자 {}가 {}에 접근합니다", username, requestUri);
 			} else {
-				log.info("유효한 JWT 토큰을 찾을 수 없습니다, uri: {}", request.getRequestURI());
+				log.info("유효한 JWT 토큰을 찾을 수 없습니다, uri: {}", requestUri);
 			}
 
 			filterChain.doFilter(request, response);
 		} finally {
 			MDC.clear();
 		}
+	}
+
+	private boolean isRestrictedUrl(String requestUri) {
+		return restrictedUrls.stream().anyMatch(requestUri::contains);
 	}
 
 	private String resolveTokenFromRequest(HttpServletRequest request) {
