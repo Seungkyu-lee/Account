@@ -1,9 +1,7 @@
 package com.example.pay.security;
 
 import java.io.IOException;
-import java.util.UUID;
 
-import org.slf4j.MDC;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -30,29 +28,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
+		String token = this.resolveTokenFromRequest(request);
 
-		String requestId = UUID.randomUUID().toString();
-		MDC.put("requestId", requestId);
+		if (token != null && tokenProvider.validateToken(token)) {
+			Authentication auth = tokenProvider.getAuthentication(token);
+			SecurityContextHolder.getContext().setAuthentication(auth);
 
-		try {
-			String token = this.resolveTokenFromRequest(request);
-
-			if (token != null && tokenProvider.validateToken(token)) {
-				Authentication auth = tokenProvider.getAuthentication(token);
-				SecurityContextHolder.getContext().setAuthentication(auth);
-
-				String username = tokenProvider.getUsername(token);
-				MDC.put("username", username);
-
-				log.info("인증된 사용자 {}가 {}에 접근합니다", username, request.getRequestURI());
-			} else {
-				log.info("유효한 JWT 토큰을 찾을 수 없습니다, uri: {}", request.getRequestURI());
-			}
-
-			filterChain.doFilter(request, response);
-		} finally {
-			MDC.clear();
+			log.info(String.format("[%s] -> %s", tokenProvider.getUsername(token), request.getRequestURI()));
 		}
+
+		filterChain.doFilter(request, response);
 	}
 
 	private String resolveTokenFromRequest(HttpServletRequest request) {
