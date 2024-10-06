@@ -1,7 +1,6 @@
 package com.example.pay.security;
 
 import java.io.IOException;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -24,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	public static final String TOKEN_PREFIX = "Bearer ";
 
 	private final TokenProvider tokenProvider;
+	private final List<String> restrictedUrls;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -35,9 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			SecurityContextHolder.getContext().setAuthentication(auth);
 
 			log.info(String.format("[%s] -> %s", tokenProvider.getUsername(token), request.getRequestURI()));
+
 		}
 
 		filterChain.doFilter(request, response);
+	}
+
+	private boolean isRestrictedUrl(String requestUri) {
+		return restrictedUrls.stream().anyMatch(requestUri::contains);
 	}
 
 	private String resolveTokenFromRequest(HttpServletRequest request) {

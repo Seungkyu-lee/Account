@@ -36,13 +36,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+	private static final String PAYMENT_CACHE_KEY_PREFIX = "payment:";
+	private static final String TRANSACTION_ID = "transactionId";
 	private final TossPaymentConfig tossPaymentConfig;
 	private final RestTemplate restTemplate;
 	private final PaymentRepository paymentRepository;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final ObjectMapper objectMapper;
-	private static final String PAYMENT_CACHE_KEY_PREFIX = "payment:";
-	private static final String TRANSACTION_ID = "transactionId";
 
 	@Override
 	@Transactional
@@ -74,6 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Payment.Response getPaymentStatus(String orderId, String paymentKey) {
 		String transactionId = UUID.randomUUID().toString();
 		MDC.put(TRANSACTION_ID, transactionId);
@@ -123,7 +124,8 @@ public class PaymentServiceImpl implements PaymentService {
 		log.debug("결제 정보 유효성 검사 완료");
 	}
 
-	private void checkExistingPayment(String orderId) {
+	@Transactional(readOnly = true)
+	public void checkExistingPayment(String orderId) {
 		log.debug("기존 결제 확인 시작. 주문 ID: {}", orderId);
 
 		Optional<PaymentEntity> existingPayment = paymentRepository.findByOrderId(orderId);
