@@ -1,16 +1,22 @@
 version: 0.2
+
 phases:
   install:
-    runtime-version:
-      java: corretto8
+    runtime-versions:
+      java: corretto17
+  pre_build:
+    commands:
+      - echo "Checking environment..."
+      - java -version
+      - chmod +x ./gradlew
+      - ./gradlew --version
   build:
     commands:
-      - echo Build start on `date`
-      - chmod u+x gradlew
+      - echo "Build started on `date`"
       - ./gradlew clean build
   post_build:
     commands:
-      - echo Build completed on `date`
+      - echo "Build completed on `date`"
 
 artifacts:
   files:
