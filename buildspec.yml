@@ -3,23 +3,27 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11
+      java: corretto17  # Java 17을 사용하도록 변경
   pre_build:
     commands:
-      - echo "Checking environment..."
+      - echo "Pre-build phase started on `date`"
       - java -version
-      - chmod +x ./gradlew
-      - ./gradlew --version
   build:
     commands:
-      - echo "Build started on `date`"
-      - ./gradlew clean build
+      - echo "Build phase started on `date`"
+      - chmod +x ./gradlew
+      - ./gradlew clean build -x test  # 테스트를 제외하고 빌드
   post_build:
     commands:
       - echo "Build completed on `date`"
+      - echo "Running tests and generating reports"
+      - ./gradlew test jacocoTestReport  # 테스트 실행 및 Jacoco 리포트 생성
+      - echo "Running SonarQube analysis"
+      - ./gradlew sonarqube  # SonarQube 분석 실행
 
 artifacts:
   files:
-    - 'module-pay/build/libs/*.jar'
-    - 'module-common/build/libs/*.jar'
+    - module-pay/build/libs/*.jar
+    - module-common/build/libs/*.jar
   discard-paths: yes
+
