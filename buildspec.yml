@@ -14,5 +14,6 @@ phases:
 
 artifacts:
   files:
-    - '**/build/libs/*.jar'
+    - 'module-api/build/libs/*.jar'
+    - 'module-common/build/libs/*.jar'
   discard-paths: yes
