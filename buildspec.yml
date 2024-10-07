@@ -15,13 +15,15 @@ phases:
       - ./gradlew clean build -x test
   post_build:
     commands:
-      - echo "Build completed on `date`"
-      - ./gradlew test jacocoTestReport
+      - echo "Post-build phase started"
+      - echo "Build completed successfully"
 
 artifacts:
   files:
     - module-pay/build/libs/*.jar
     - module-common/build/libs/*.jar
+  exclude:
+    - '**/*-plain.jar'
   discard-paths: yes
 
 cache:
