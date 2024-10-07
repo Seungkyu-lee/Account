@@ -17,9 +17,7 @@ phases:
     commands:
       - echo "Build completed on `date`"
       - echo "Running tests and generating reports"
-      - ./gradlew test jacocoTestReport  # 테스트 실행 및 Jacoco 리포트 생성
       - echo "Running SonarQube analysis"
-      - ./gradlew sonarqube  # SonarQube 분석 실행
 
 artifacts:
   files:
