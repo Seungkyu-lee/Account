@@ -3,14 +3,12 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11  # 프로젝트에 맞는 Java 버전으로 수정
-
+      java: corretto17
   pre_build:
     commands:
       - echo "Pre-build phase started"
       - java -version
       - chmod +x ./gradlew
-
   build:
     commands:
       - echo "Build phase started"
@@ -23,10 +21,8 @@ phases:
 
 artifacts:
   files:
-    - 'module-pay/build/libs/*.jar'
-    - 'module-common/build/libs/*.jar'
-  exclude:
-    - '**/*-plain.jar'
+    - module-pay/build/libs/*.jar
+    - module-common/build/libs/*.jar
   discard-paths: yes
 
 cache:
