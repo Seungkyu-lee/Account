@@ -6,18 +6,17 @@ phases:
       java: corretto17
   pre_build:
     commands:
-      - echo "Pre-build phase started"
+      - echo "Pre-build phase started on `date`"
       - java -version
-      - chmod +x ./gradlew
   build:
     commands:
-      - echo "Build phase started"
-      - ./gradlew clean build
-
+      - echo "Build phase started on `date`"
+      - chmod +x ./gradlew
+      - ./gradlew clean build -x test
   post_build:
     commands:
-      - echo "Post-build phase started"
-      - echo "Build completed successfully"
+      - echo "Build completed on `date`"
+      - ./gradlew test jacocoTestReport
 
 artifacts:
   files:
