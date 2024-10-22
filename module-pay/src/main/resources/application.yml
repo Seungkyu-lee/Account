@@ -18,6 +18,17 @@ spring:
     port: 6379
   jwt:
     secret: ZGF5b25lLXNwcmluZy1ib290LWRpdmlkZW5kLXByb2plY3QtdHV0b3JpYWwtand0LXNlY3JldC1rZXkK
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: leesk3732@gmail.com
+    password: kmnt emyf vzlg ewux
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 payment:
   toss:
@@ -38,28 +49,29 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
+
 debug: false
 
 spring.autoconfigure.exclude:
   - org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration
+
 
 ---
 spring:
   config:
     activate:
       on-profile: dev
-  # ?? ?? ?? ??
+
 
 ---
 spring:
   config:
     activate:
       on-profile: test
-  # ??? ?? ?? ??
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  # ?? ?? ?? ??
+

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,21 +22,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Builder
 @Entity
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class MemberEntity implements UserDetails {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(unique = true)
 	private String username;
 
 	@JsonIgnore
 	private String password;
+
+	@Column(unique = true)
+	private String email;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> roles;
@@ -43,19 +49,9 @@ public class MemberEntity implements UserDetails {
 	@Override
 	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.roles.stream()
+		return roles.stream()
 			.map(SimpleGrantedAuthority::new)
 			.toList();
-	}
-
-	@Override
-	public String getPassword() {
-		return this.password;
-	}
-
-	@Override
-	public String getUsername() {
-		return this.username;
 	}
 
 	@Override

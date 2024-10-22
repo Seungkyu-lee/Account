@@ -19,12 +19,14 @@ public class Auth {
 	public static class SignUp {
 		private String username;
 		private String password;
+		private String email;
 		private List<String> roles;
 
 		public MemberEntity toEntity() {
 			return MemberEntity.builder()
 				.username(this.username)
 				.password(this.password)
+				.email(this.email)
 				.roles(this.roles)
 				.build();
 		}

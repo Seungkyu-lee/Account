@@ -31,7 +31,7 @@ public class AuthController {
 	public CommonResponse<MemberEntity> signup(@RequestBody Auth.SignUp request) {
 		log.info("회원가입 요청 받음. 사용자명: {}", request.getUsername());
 		var result = this.memberService.register(request);
-		log.info("회원가입 성공. 사용자명: {}", result.getUsername());
+		log.info("회원가입 성공. 사용자명: {}, 이메일: {}", result.getUsername(), result.getEmail());
 		return CommonResponse.success(result);
 	}
 

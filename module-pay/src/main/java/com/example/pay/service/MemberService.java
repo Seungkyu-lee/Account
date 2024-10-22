@@ -21,6 +21,7 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final EmailService emailService;
 
 	public MemberEntity register(Auth.SignUp member) {
 		boolean exists = memberRepository.existsByUsername(member.getUsername());
@@ -30,7 +31,12 @@ public class MemberService {
 
 		// 패스워드 인코딩
 		member.setPassword(passwordEncoder.encode(member.getPassword()));
-		return memberRepository.save(member.toEntity());
+
+		MemberEntity savedMember = memberRepository.save(member.toEntity());
+		// 비동기로 이메일 발송
+		emailService.sendRegistrationEmail(savedMember.getEmail(), savedMember.getUsername());
+
+		return savedMember;
 	}
 
 	public MemberEntity authenticate(Auth.SignIn member) {
@@ -50,3 +56,4 @@ public class MemberService {
 			.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다: " + username));
 	}
 }
+

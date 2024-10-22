@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     implementation project(':module-common')
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 sourceSets {
