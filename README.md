@@ -5,7 +5,7 @@ Spring Boot 기반의 결제 서비스 멀티 모듈 프로젝트입니다. 공�
 ## 기술 스택
 
 - Backend
-    - Java 17 (Amazon Corretto)
+    - Java 17
     - Spring Boot 3.1.3
     - Spring Security
     - Spring Data JPA
