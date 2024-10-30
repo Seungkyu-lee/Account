@@ -26,6 +26,7 @@ public class EmailService {
 
 	@Async("taskExecutor")
 	public void sendRegistrationEmail(String to, String username) {
+
 		try {
 			log.info("회원가입 이메일 발송 준비 중: {}", to);
 			MimeMessage message = mailSender.createMimeMessage();

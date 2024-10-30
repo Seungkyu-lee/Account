@@ -1,8 +1,11 @@
 package com.example.pay.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
 
 import com.example.pay.domain.Auth;
 import com.example.pay.domain.MemberEntity;
@@ -23,6 +26,12 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final EmailService emailService;
 
+	private final JavaMailSender mailSender;
+	private final TemplateEngine templateEngine;
+
+	@Value("${spring.mail.username}")
+	private String fromEmail;
+
 	public MemberEntity register(Auth.SignUp member) {
 		boolean exists = memberRepository.existsByUsername(member.getUsername());
 		if (exists) {
@@ -34,6 +43,7 @@ public class MemberService {
 
 		MemberEntity savedMember = memberRepository.save(member.toEntity());
 		// 비동기로 이메일 발송
+		log.info("register: " + Thread.currentThread().getName());
 		emailService.sendRegistrationEmail(savedMember.getEmail(), savedMember.getUsername());
 
 		return savedMember;

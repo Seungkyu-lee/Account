@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+	private final PaymentEventPublisher eventPublisher;
 	private final TossPaymentConfig tossPaymentConfig;
 	private final RestTemplate restTemplate;
 	private final PaymentRepository paymentRepository;
@@ -61,6 +62,9 @@ public class PaymentServiceImpl implements PaymentService {
 
 			savePaymentInfo(Objects.requireNonNull(responseBody));
 			invalidateCache(request.getOrderId(), request.getPaymentKey());
+
+			eventPublisher.publishPaymentStatusChange(responseBody.getOrderId(), responseBody.getStatus());
+			log.info("결제 상태 변경 이벤트 발행 완료: status={}", responseBody.getStatus());
 
 			return responseBody;
 		} catch (Exception e) {
