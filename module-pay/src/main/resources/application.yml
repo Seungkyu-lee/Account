@@ -1,6 +1,19 @@
+# 공통 설정
 spring:
+  profiles:
+    active: dev
   application:
     name: pay
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+# 개발 환경 (default)
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
   h2:
     console:
       enabled: true
@@ -10,9 +23,15 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password:
-  jackson:
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop  # 개발환경에서만 사용
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    open-in-view: false
   redis:
     host: localhost
     port: 6379
@@ -44,34 +63,96 @@ logging:
     com.example.pay: DEBUG
     org.springframework.boot.autoconfigure: WARN
   file:
-    name: ./logs/application.log
+    name: ./logs/dev/application.log
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-
-debug: false
-
-spring.autoconfigure.exclude:
-  - org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration
-
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-
-
+# 테스트 환경
 ---
 spring:
   config:
     activate:
       on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
 
+  redis:
+    host: localhost
+    port: 6379
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.example.pay: INFO
+    org.springframework: INFO
+    org.hibernate: INFO
+  file:
+    name: ./logs/test/application.log
+
+payment:
+  toss:
+    test_secrete_api_key: ${TOSS_TEST_KEY}
+    success_url: http://test-server:8080/api/v1/payments/toss/success
+    fail_url: http://test-server:8080/api/v1/payments/toss/fail
+
+# 운영 환경
 ---
 spring:
   config:
     activate:
       on-profile: prod
+  datasource:
+    url: jdbc:mysql://production-db:3306/paydb
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none  # 운영환경에서는 none 또는 validate 사용
+    properties:
+      hibernate:
+        format_sql: false
+    open-in-view: false
+  redis:
+    host: production-redis
+    port: 6379
+  h2:
+    console:
+      enabled: false
 
+logging:
+  level:
+    root: WARN
+    com.example.pay: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+  file:
+    name: ./logs/prod/application.log
+
+payment:
+  toss:
+    test_secrete_api_key: ${TOSS_PROD_KEY}
+    success_url: https://production-server/api/v1/payments/toss/success
+    fail_url: https://production-server/api/v1/payments/toss/fail
+
+# 공통 설정
+debug: false
+
+spring.autoconfigure.exclude:
+  - org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration

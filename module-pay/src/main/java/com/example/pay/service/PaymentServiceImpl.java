@@ -1,6 +1,7 @@
 package com.example.pay.service;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,11 +64,20 @@ public class PaymentServiceImpl implements PaymentService {
 			savePaymentInfo(Objects.requireNonNull(responseBody));
 			invalidateCache(request.getOrderId(), request.getPaymentKey());
 
-			eventPublisher.publishPaymentStatusChange(responseBody.getOrderId(), responseBody.getStatus());
+			Payment.PaymentEventDto eventDto = Payment.PaymentEventDto.from(responseBody);
+			eventPublisher.publishPaymentCompleted(eventDto);
 			log.info("결제 상태 변경 이벤트 발행 완료: status={}", responseBody.getStatus());
 
 			return responseBody;
 		} catch (Exception e) {
+			Payment.PaymentFailureEvent failureEvent = Payment.PaymentFailureEvent.builder()
+				.orderId(request.getOrderId())
+				.paymentKey(request.getPaymentKey())
+				.errorCode("PAYMENT_FAILED")
+				.errorMessage(e.getMessage())
+				.failedAt(OffsetDateTime.now())
+				.build();
+			eventPublisher.publishPaymentFailed(failureEvent);
 			log.error("결제 처리 중 오류 발생: transactionId={}, error={}", transactionId, e.getMessage(), e);
 			throw new PaymentException(ErrorCode.PAYMENT_PROCESSING_ERROR, "결제 처리 중 오류가 발생했습니다: " + e.getMessage());
 		} finally {

@@ -32,6 +32,10 @@ public class Payment {
 		@NotNull(message = "Amount is required")
 		@Positive(message = "Amount must be positive")
 		private Integer amount;
+
+		private String userIp;
+		private String userAgent;
+		private String deviceInfo;
 	}
 
 	@Data
@@ -192,5 +196,51 @@ public class Payment {
 	@AllArgsConstructor
 	public static class Discount {
 		private Integer amount;
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PaymentEventDto {
+		private String orderId;
+		private String status;
+		private Integer amount;
+		private String paymentKey;
+		private OffsetDateTime approvedAt;
+		private String paymentType;
+
+		public static PaymentEventDto from(Response response) {
+			return PaymentEventDto.builder()
+				.orderId(response.getOrderId())
+				.status(response.getStatus())
+				.amount(response.getTotalAmount())
+				.paymentKey(response.getPaymentKey())
+				.approvedAt(response.getApprovedAt())
+				.paymentType(response.getType())
+				.build();
+		}
+	}
+
+	@Data
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PaymentFailureEvent {
+		private String orderId;
+		private String paymentKey;
+		private String errorCode;
+		private String errorMessage;
+		private OffsetDateTime failedAt;
+
+		public static PaymentFailureEvent from(Response response, String errorCode, String errorMessage) {
+			return PaymentFailureEvent.builder()
+				.orderId(response.getOrderId())
+				.paymentKey(response.getPaymentKey())
+				.errorCode(errorCode)
+				.errorMessage(errorMessage)
+				.failedAt(OffsetDateTime.now())
+				.build();
+		}
 	}
 }
