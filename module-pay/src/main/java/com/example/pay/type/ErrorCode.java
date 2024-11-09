@@ -33,7 +33,12 @@ public enum ErrorCode {
 
 	// 보안 관련 에러
 	UNAUTHORIZED("인증되지 않은 요청입니다"),
-	FORBIDDEN("접근 권한이 없습니다");
+	FORBIDDEN("접근 권한이 없습니다"),
+
+	// 배치 관련 오류
+	JOB_EXECUTION_ERROR("배치 작업 실행 중 오류가 발생했습니다."),
+	INVALID_JOB_PARAMETER("잘못된 작업 파라미터입니다."),
+	JOB_INSTANCE_ALREADY_EXISTS("이미 존재하는 작업 인스턴스입니다.");
 
 	private final String description;
 }
